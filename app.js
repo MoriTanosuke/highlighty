@@ -1,4 +1,5 @@
 var http = require('http')
+   ,url  = require('url')
    ,fs   = require('fs');
 
 http.createServer(function (request, response) {
@@ -6,7 +7,7 @@ http.createServer(function (request, response) {
   if(request.url == "/") {
     f += "/index.html";
   } else {
-    f += request.url;
+    f += url.parse(request.url)['pathname'];
   }
   fs.readFile(f, function(err, data){
     if(err) {

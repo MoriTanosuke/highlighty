@@ -8,24 +8,22 @@
 <script type="text/javascript">
 $(document).ready(function() {
   $('#generate').bind('click', function() {
-    $('#preview pre').text($('#source').text());
-    SyntaxHighlighter.all();
+    $('#preview').html('<pre class="brush: java">' + $('#source').val() + '</pre>');
+    SyntaxHighlighter.highlight();
   });
 });
 </script>
 </head>
 <body>
-	<textarea id="source" style="width: 100%; height: 200px;">
-public class Test {
+	<textarea id="source" style="width: 100%; height: 200px;">public class Test {
   private String test = "foo";
-}
-	</textarea>
+}</textarea>
 	<a href="#" id="generate">preview</a>
 	<div id="preview"><pre class="brush: java">
 public class Test {
   private String test = "foo";
 }
-	</pre></div>
+</pre></div>
 
 <script type="text/javascript">
 SyntaxHighlighter.autoloader(

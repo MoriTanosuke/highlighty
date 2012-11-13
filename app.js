@@ -1,7 +1,7 @@
 var http = require('http')
    ,url  = require('url')
    ,fs   = require('fs');
-
+var port = process.env.PORT || 8888;
 http.createServer(function (request, response) {
   var f = ".";
   if(request.url == "/") {
@@ -23,7 +23,7 @@ http.createServer(function (request, response) {
     response.writeHead(200, header);
     return response.end(data);
   });
-}).listen(8124);
+}).listen(port);
 
 console.log('Server running at http://127.0.0.1:8124/');
 

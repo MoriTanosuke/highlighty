@@ -1,29 +1,45 @@
-var http = require('http')
-   ,url  = require('url')
-   ,fs   = require('fs');
-var port = process.env.PORT || 8888;
-http.createServer(function (request, response) {
-  var f = ".";
-  if(request.url == "/") {
-    f += "/index.html";
-  } else {
-    f += url.parse(request.url)['pathname'];
-  }
-  fs.readFile(f, function(err, data){
-    if(err) {
-      response.writeHead(500);
-      return response.end();
-    }
-    header = {'Content-Type': 'text/html'};
-    if(f.substring(f.length - 3) == ".js") {
-      header['Content-Type'] = 'text/javascript';
-    } else if(f.substring(f.length - 4) == ".css") {
-      header['Content-Type'] = 'text/css';
-    }
-    response.writeHead(200, header);
-    return response.end(data);
-  });
-}).listen(port);
+var connect = require('connect')
+   ,render = require('connect-render')
+   ,urlrouter = require('urlrouter')
+   ,redis = require('redis-url').connect(process.env.REDISTOGO_URL || "http://127.0.0.1:6379")
+;
 
-console.log('Server running at http://127.0.0.1:8124/');
+var port = process.env.PORT || 8888;
+
+var app = connect(render({
+		root: __dirname + '/views',
+		layout: 'index.html',
+		cache: false
+	}))
+	.use(connect.static('public'))
+	.use(connect.favicon())
+	.use(connect.bodyParser())
+	.use(urlrouter(function(app) {
+	app.post('/save', function(req, res, next) {
+		redis.get('next.id', function(err, id) {
+			redis.incr('next.id');
+			redis.set(id + ':source', req.body.source);
+			redis.set(id + ':brush', req.body.brush);
+			res.end('<a href="/paste/' + id + '">click here to continue</a>');
+		});
+	});
+	app.get('/paste/:id', function(req, res, next) {
+		var id = req.params.id;
+		redis.get(id + ':source', function(err, source) {
+			if(err) {
+				//TODO display message if paste not found
+				res.render('index.html', {msg: 'Not found!'});
+			} else {
+				redis.get(id + ':brush', function(err, brush) {
+					res.render('index.html', {source: source, brush: brush});
+				});
+			}
+		});
+	});
+	}))
+	.use(function(req, res) {
+		res.render('index.html', {source: '', brush: '', url: req.url });
+	})
+	.listen(port);
+console.log('Server running at http://127.0.0.1:' + port);
 

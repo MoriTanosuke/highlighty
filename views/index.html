@@ -21,9 +21,7 @@ $(document).ready(function() {
 </head>
 <body>
 <form method="POST" action="/save">
-	<textarea id="source" name="source" style="width: 100%; height: 200px;">public class Test {
-  private String test = "foo";
-}</textarea>
+	<textarea id="source" name="source" style="width: 100%; height: 200px;"><%= source || 'public class Test {\n  private String test = "foo";\n}' %></textarea>
 	<select id="brush" name="brush">
 		<option>java</option>
 		<option>js</option>
@@ -31,15 +29,12 @@ $(document).ready(function() {
 		<option>xml</option>
 	</select>
 	<a href="#" id="generate">preview</a>
-	<div id="preview"><pre class="brush: java">
-public class Test {
-  private String test = "foo";
-}
-</pre></div>
+	<div id="preview"><pre class="brush: <%= brush || 'java' %>"><%= source || 'public class Test {\n  private String test = "foo";\n}' %></pre></div>
 <input type="submit" value="save"/>
 </form>
 
 <script type="text/javascript">
+
 SyntaxHighlighter.all();
 </script>
 </body>

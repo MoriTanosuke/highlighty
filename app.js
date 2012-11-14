@@ -20,7 +20,7 @@ var app = connect(render({
 			redis.incr('next.id');
 			redis.set(id + ':source', req.body.source);
 			redis.set(id + ':brush', req.body.brush);
-			res.end('<a href="/paste/' + id + '">click here to continue</a>');
+			res.end('<a href="/paste/' + id + '">click here to see your saved paste</a>');
 		});
 	});
 	app.get('/paste/:id', function(req, res, next) {

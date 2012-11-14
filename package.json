@@ -2,6 +2,7 @@
   "name": "highlighty",
   "version": "0.0.1",
   "dependencies": {
+    "redis-url" "0.1.0"
   },
   "engines": {
     "node": "0.8.x",

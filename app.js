@@ -17,13 +17,17 @@ var app = connect(render({
 	.use(urlrouter(function(app) {
 	app.post('/save', function(req, res, next) {
 		redis.get('next.id', function(err, id) {
-			// remember used IDs for lookup
-			redis.rpush('used.ids');
-			redis.incr('next.id');
-			// store the new paste
-			redis.set(id + ':source', req.body.source);
-			redis.set(id + ':brush', req.body.brush);
-			res.end('<a href="/paste/' + id + '">click here to see your saved paste</a>');
+			if(err) {
+				res.end('Something went wrong! <a href="/">Try again.</a>');
+			} else {
+				// remember used IDs for lookup
+				redis.rpush('used.ids');
+				redis.incr('next.id');
+				// store the new paste
+				redis.set(id + ':source', req.body.source);
+				redis.set(id + ':brush', req.body.brush);
+				res.end('<a href="/paste/' + id + '">click here to see your saved paste</a>');
+			}
 		});
 	});
 	app.get('/paste/:id', function(req, res, next) {
@@ -34,14 +38,21 @@ var app = connect(render({
 				res.render('index.html', {msg: 'Not found!'});
 			} else {
 				redis.get(id + ':brush', function(err, brush) {
-					res.render('index.html', {source: source, brush: brush});
+					res.render('index.html', {source: source, brush: brush, pastes: []});
 				});
 			}
 		});
 	});
 	}))
 	.use(function(req, res) {
-		res.render('index.html', {source: '', brush: '', url: req.url });
+		redis.lrange('used.ids', -10, -1, function(err, data) {
+			console.log('used.ids=' + data + "," + err);
+			if(err) {
+				res.render('index.html', {msg: err});
+			} else {
+				res.render('index.html', {source: '', brush: '', url: req.url, pastes: data});
+			}
+		});
 	})
 	.listen(port);
 console.log('Server running at http://127.0.0.1:' + port);

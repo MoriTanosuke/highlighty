@@ -37,8 +37,16 @@ $(document).ready(function() {
 <input type="submit" value="save"/>
 </form>
 
-<script type="text/javascript">
+<% if(pastes != undefined && pastes.length > 0) { %>
+<div class="section">
+<h2>Last 10 pastes</h2>
+<ul><% pastes.forEach(function(name) { %>
+  <li><%= name %></li>
+<% }); %></ul>
+</div>
+<% } %>
 
+<script type="text/javascript">
 SyntaxHighlighter.all();
 </script>
 </body>

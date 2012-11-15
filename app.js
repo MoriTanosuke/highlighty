@@ -17,7 +17,10 @@ var app = connect(render({
 	.use(urlrouter(function(app) {
 	app.post('/save', function(req, res, next) {
 		redis.get('next.id', function(err, id) {
+			// remember used IDs for lookup
+			redis.rpush('used.ids');
 			redis.incr('next.id');
+			// store the new paste
 			redis.set(id + ':source', req.body.source);
 			redis.set(id + ':brush', req.body.brush);
 			res.end('<a href="/paste/' + id + '">click here to see your saved paste</a>');

@@ -19,12 +19,13 @@ var app = connect(render({
 	app.get('/cleanup', function(req, res, next) {
 		// remove all entries, only keep 10
 		var len = redis.llen('used.ids');
+		console.log("Removing " + len + " highlights.");
 		for(i = len; i >= 0; i--) {
-		    console.log("var id = redis.lpop('used.ids')");
-			console.log("redis.del(id + ':source')");
-			console.log("redis.del(id + ':brush')");
+		    var id = redis.lpop('used.ids');
+			redis.del(id + ':source');
+			redis.del(id + ':brush');
 		}
-		res.render('index.html', {msg: 'Highlights cleaned up.', source: 'undefined', brush: 'undefined', pastes: []});
+		res.render('index.html', {msg: 'Highlights cleaned up.', source: [], brush: [], pastes: []});
 	});
 	app.post('/save', function(req, res, next) {
 		redis.get('next.id', function(err, id) {

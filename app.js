@@ -20,8 +20,9 @@ var app = connect(render({
 		// remove all entries, only keep 10
 		var len = redis.llen('used.ids');
 		console.log("Removing " + len + " highlights.");
-		for(i = len; i >= 0; i--) {
+		for(i = len - 10; i >= 0; i--) {
 		    var id = redis.lpop('used.ids');
+			console.log("Removing highlight " + id);
 			redis.del(id + ':source');
 			redis.del(id + ':brush');
 		}

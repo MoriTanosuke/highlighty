@@ -19,7 +19,7 @@ var app = connect(render({
 	app.get('/cleanup', function(req, res, next) {
 		// remove all entries, only keep 10
 		var len = redis.llen('used.ids');
-		for(int i = len; i >= 0; i--) {
+		for(i = len; i >= 0; i--) {
 		    console.log("var id = redis.lpop('used.ids')");
 			console.log("redis.del(id + ':source')");
 			console.log("redis.del(id + ':brush')");

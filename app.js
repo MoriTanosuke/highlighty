@@ -15,7 +15,7 @@ var app = connect(render({
 	.use(connect.favicon())
 	.use(connect.bodyParser())
 	.use(urlrouter(function(app) {
-	// clean up old entries from Redis
+	/*	clean up old entries from Redis
 	app.get('/cleanup', function(req, res, next) {
 		// remove all entries, only keep 10
 		redis.llen('used.ids', function(err, len) {
@@ -29,6 +29,7 @@ var app = connect(render({
 			res.render('index.html', {msg: 'Highlights cleaned up.', source: [], brush: [], pastes: []});
 		});
 	});
+	*/
 	app.post('/save', function(req, res, next) {
 		redis.get('next.id', function(err, id) {
 			if(err) {

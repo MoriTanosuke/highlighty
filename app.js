@@ -18,15 +18,16 @@ var app = connect(render({
 	// clean up old entries from Redis
 	app.get('/cleanup', function(req, res, next) {
 		// remove all entries, only keep 10
-		var len = redis.llen('used.ids');
-		console.log("Removing " + len + " highlights.");
-		for(i = len - 10; i >= 0; i--) {
-		    var id = redis.lpop('used.ids');
-			console.log("Removing highlight " + id);
-			redis.del(id + ':source');
-			redis.del(id + ':brush');
-		}
-		res.render('index.html', {msg: 'Highlights cleaned up.', source: [], brush: [], pastes: []});
+		redis.llen('used.ids', function(err, len) {
+			console.log("Removing " + len + " highlights.");
+			for(i = len - 10; i >= 0; i--) {
+				var id = redis.lpop('used.ids');
+				console.log("Removing highlight " + id);
+				redis.del(id + ':source');
+				redis.del(id + ':brush');
+			}
+			res.render('index.html', {msg: 'Highlights cleaned up.', source: [], brush: [], pastes: []});
+		});
 	});
 	app.post('/save', function(req, res, next) {
 		redis.get('next.id', function(err, id) {

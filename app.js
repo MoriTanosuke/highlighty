@@ -24,7 +24,7 @@ var app = connect(render({
 			console.log("redis.del(id + ':source')");
 			console.log("redis.del(id + ':brush')");
 		}
-		res.render('index.html', {msg: 'Highlights cleaned up.'});
+		res.render('index.html', {msg: 'Highlights cleaned up.', source: 'undefined'});
 	});
 	app.post('/save', function(req, res, next) {
 		redis.get('next.id', function(err, id) {

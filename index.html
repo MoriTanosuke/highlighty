@@ -3,6 +3,16 @@
 {% block title %}List highlights{% endblock %}
 
 {% block content %}
+<script type="text/javascript">
+$(document).ready(function() {
+$('#generate').bind('click', function() {
+var brush = $('#brush').val();
+$('#preview').html('<pre class="brush: ' + brush +'">' + $('#content').val() + '</pre>');
+SyntaxHighlighter.highlight();
+});
+});
+</script>
+
 <div>
     <form action="/new?%s" method="post">
       <div class="g-recaptcha" data-sitekey="{{ recaptcha_public_key }}"></div>
@@ -11,9 +21,9 @@
 <option>{{ brush }}</option>
 {% endfor %}
 </select></div>
-      <div><textarea name="content" rows="3" cols="60" placeholder="Enter your code..."></textarea></div>
-      <div><input type="submit"> <a href="#">generate preview</a></div>
-      <div id="preview"><strong>Preview</strong><br /><pre class="brush: java">No content yet.</pre></div>
+      <div><textarea name="content" id="content" rows="3" cols="60" placeholder="Enter your code..."></textarea></div>
+      <div><input type="submit"> <a href="#" class="button" id="generate">generate preview</a></div>
+      <div><strong>Preview</strong><br /><div id="preview"><pre class="brush: java">No content yet.</pre></div></div>
     </form>
 </div>
 <div>

@@ -52,8 +52,6 @@ class Save(webapp2.RequestHandler):
 		response = urlfetch.fetch(verify_url)
 		# parse JSON response
 		data = json.loads(response.content)
-		logging.info("--- DATA ---")
-		logging.info(data)
 		# break if response.success != True
 		if response.status_code == 200 and data['success'] == True:
 			title = self.request.get('title')

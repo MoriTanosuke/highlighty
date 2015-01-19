@@ -1,5 +1,9 @@
 import os
+import json
+import json
+import logging
 
+from google.appengine.api import urlfetch
 # Imports the NDB data modeling API
 from google.appengine.ext import ndb
 
@@ -10,16 +14,15 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
-
-DEFAULT_TITLE = 'a new highlight'
+BRUSHES = ["java", "js", "diff", "xml"]
 
 # [START highlight]
 class Highlight(ndb.Model):
 	"""Contains the code to highlight and the highlight settings."""
-	title = ndb.StringProperty(indexed=True)
-	content = ndb.StringProperty(indexed=False)
-	date = ndb.DateTimeProperty(auto_now_add=True)
-	brush = ndb.StringProperty(indexed=True)
+	title = ndb.StringProperty(indexed=True, required=True)
+	content = ndb.StringProperty(indexed=False, required=True)
+	date = ndb.DateTimeProperty(auto_now_add=True, required=True)
+	brush = ndb.StringProperty(indexed=True, required=True, choices=set(BRUSHES))
 # [END highlight]
 
 # [START main_page]
@@ -29,46 +32,74 @@ class MainPage(webapp2.RequestHandler):
 		highlight_query = Highlight.query()
 		highlights = highlight_query.fetch(10)
 		# [END query]
-		
+
 		model = {
-			'highlights': highlights
+			'highlights': highlights,
+			'recaptcha_public_key': os.getenv('RECAPTCHA_PUBLIC_KEY'),
+			'brushes': BRUSHES
 		}
 
 		template = JINJA_ENVIRONMENT.get_template('index.html')
 		self.response.write(template.render(model))
 # [END main_page]
 
+# [START save]
 class Save(webapp2.RequestHandler):
 	def post(self):
-		highlight = Highlight()
-		highlight.title = self.request.get('title', DEFAULT_TITLE)
-		highlight.content = self.request.get('content')
-		highlight.brush = self.request.get('brush', 'java')
-		highlight.put()
-		self.redirect('/')
-
-class Show(webapp2.RequestHandler):
-	def get(self, search):
-		highlight = Highlight.get_by_id(search)
-		if highlight == None:
-			model = {
-				'error': 'No highlight found!',
-				'highlight': {
-					'title': 'Not found',
-					'content': 'Not found',
-					'brush': 'java'
-				}
-			}
+		captcha_response = self.request.get('g-recaptcha-response')
+		# verify captcha
+		verify_url = 'https://www.google.com/recaptcha/api/siteverify?secret=' + os.getenv('RECAPTCHA_SECRET_KEY') + '&response=' + captcha_response
+		response = urlfetch.fetch(verify_url)
+		# parse JSON response
+		data = json.loads(response.content)
+		logging.info("--- DATA ---")
+		logging.info(data)
+		# break if response.success != True
+		if response.status_code == 200 and data['success'] == True:
+			title = self.request.get('title')
+			if not title:
+				title = 'No title set'
+			highlight = Highlight()
+			highlight.title = title
+			highlight.content = self.request.get('content')
+			highlight.brush = self.request.get('brush')
+			highlight.put()
+			self.redirect('/')
 		else:
 			model = {
-				'highlight': highlight
+				'error': 'Captcha failed: ' + str(data['error-codes'])
 			}
+			# TODO redirect to / with model
+			template = JINJA_ENVIRONMENT.get_template('index.html')
+			self.response.write(template.render(model))
+# [END save]
+
+# [START show]
+class Show(webapp2.RequestHandler):
+	def get(self, search):
+		k = ndb.Key(urlsafe=search)
+		highlight = k.get()
+		if highlight == None:
+			error = 'No highlight found!'
+			highlight = {
+				'title': 'Not found',
+				'content': 'Not found',
+				'brush': 'java'
+			}
+		else:
+			error = None
+
+		model = {
+			'error': error,
+			'highlight': highlight
+		}
 		template = JINJA_ENVIRONMENT.get_template('show.html')
 		self.response.write(template.render(model))
+# [END show]
 
 application = webapp2.WSGIApplication([
 	('/', MainPage),
 	('/new', Save),
-	('/(\d+)', Show)
+	('/show/([A-Za-z0-9\-]+)', Show)
 ], debug=True)
 

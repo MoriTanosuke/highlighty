@@ -1,0 +1,59 @@
+<html>
+<head>
+<title>{% block title %}{% endblock %} - highlighty</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="//www.google.com/recaptcha/api.js" async defer></script>
+<script src="//code.jquery.com/jquery.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet" media="screen">
+
+<script src="/js/shCore.js" type="text/javascript"></script>
+<script src="/js/shAutoloader.js" type="text/javascript"></script>
+<script src="/js/shBrushJava.js" type="text/javascript"></script>
+<script src="/js/shBrushDiff.js" type="text/javascript"></script>
+<script src="/js/shBrushXml.js" type="text/javascript"></script>
+<script src="/js/shBrushJScript.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="/css/shCore.css" />
+<link rel="stylesheet" type="text/css" href="/css/shThemeDefault.css" />
+</head>
+<body>
+<div class="container">
+
+<div id="header">
+<h1>Highlighty</h1>
+<h2>Create and share syntax highlighted code</h2>
+</div>
+<hr />
+
+{% if error %}
+<h3>Error</h3>
+<div class="error">{{ error }}</div>
+{% endif %}
+
+<div>{% block content %}{% endblock %}</div>
+
+<hr />
+<div id="footer">
+<!-- Piwik -->
+<script type="text/javascript">
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://kopis.de/piwik/" : "http://kopis.de/piwik/");
+document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script type="text/javascript">
+try {
+var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 7);
+piwikTracker.trackPageView();
+piwikTracker.enableLinkTracking();
+} catch( err ) {}
+</script><noscript><p><img src="http://kopis.de/piwik/piwik.php?idsite=7" style="border:0" alt="" /></p></noscript>
+<p>I'm tracking visitors with my own <a href="http://piwik.org/">Piwik</a> installation.</p>
+<!-- End Piwik Tracking Code -->
+</div>
+
+</div>	
+</body>
+</html>
+

@@ -65,7 +65,7 @@ class Save(webapp2.RequestHandler):
 			self.redirect('/')
 		else:
 			model = {
-				'error': 'Captcha failed: ' + str(map(get_error_message, data))
+				'error': 'Captcha failed: ' + ", ".join(map(get_error_message, data['error-codes']))
 			}
 			# TODO redirect to / with model
 			template = JINJA_ENVIRONMENT.get_template('index.html')

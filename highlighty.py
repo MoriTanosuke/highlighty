@@ -14,7 +14,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
-BRUSHES = ["java", "js", "diff", "xml"]
+BRUSHES = ["AppleScript", "AS3", "Bash", "ColdFusion", "Cpp", "CSharp", "Css", "Delphi", "Diff", "Erlang", "Groovy", "JavaFX", "Java", "JScript", "Perl", "Php", "Plain", "PowerShell", "Python", "Ruby", "Sass", "Scala", "Sql", "Vb", "Xml", "Html"]
 JINJA_ENVIRONMENT.globals['brushes'] = BRUSHES
 
 # [START highlight]

@@ -24,14 +24,16 @@
 <div class="container">
 
 <div id="header">
-<h1>Highlighty</h1>
+<h1><a href="/">Highlighty</a></h1>
 <h2>Create and share syntax highlighted code</h2>
 </div>
 <hr />
 
 {% if error %}
-<h3>Error</h3>
-<div class="error">{{ error }}</div>
+<div class="alert alert-danger" role="alert">
+<strong>Error</strong>
+<p>{{ error }}</p>
+</div>
 {% endif %}
 
 <div>{% block content %}{% endblock %}</div>

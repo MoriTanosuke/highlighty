@@ -15,6 +15,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 BRUSHES = ["java", "js", "diff", "xml"]
+JINJA_ENVIRONMENT.globals['brushes'] = BRUSHES
 
 # [START highlight]
 class Highlight(ndb.Model):
@@ -35,8 +36,7 @@ class MainPage(webapp2.RequestHandler):
 
 		model = {
 			'highlights': highlights,
-			'recaptcha_public_key': os.getenv('RECAPTCHA_PUBLIC_KEY'),
-			'brushes': BRUSHES
+			'recaptcha_public_key': os.getenv('RECAPTCHA_PUBLIC_KEY', ''),
 		}
 
 		template = JINJA_ENVIRONMENT.get_template('index.html')
@@ -48,7 +48,7 @@ class Save(webapp2.RequestHandler):
 	def post(self):
 		captcha_response = self.request.get('g-recaptcha-response')
 		# verify captcha
-		verify_url = 'https://www.google.com/recaptcha/api/siteverify?secret=' + os.getenv('RECAPTCHA_SECRET_KEY') + '&response=' + captcha_response
+		verify_url = 'https://www.google.com/recaptcha/api/siteverify?secret=' + os.getenv('RECAPTCHA_SECRET_KEY', '') + '&response=' + captcha_response
 		response = urlfetch.fetch(verify_url)
 		# parse JSON response
 		data = json.loads(response.content)
@@ -65,7 +65,7 @@ class Save(webapp2.RequestHandler):
 			self.redirect('/')
 		else:
 			model = {
-				'error': 'Captcha failed: ' + str(data['error-codes'])
+				'error': 'Captcha failed: ' + str(map(get_error_message, data))
 			}
 			# TODO redirect to / with model
 			template = JINJA_ENVIRONMENT.get_template('index.html')
@@ -94,6 +94,16 @@ class Show(webapp2.RequestHandler):
 		template = JINJA_ENVIRONMENT.get_template('show.html')
 		self.response.write(template.render(model))
 # [END show]
+
+###
+def get_error_message(code):
+	if code == 'missing-input-response':
+		return 'Missing input. Did you answer the captcha?'
+	elif code == 'invalid-input-secret':
+		return 'Wrong captcha response! Are you really a human?'
+	else:
+		return 'Unknown error: ' + code
+###
 
 application = webapp2.WSGIApplication([
 	('/', MainPage),

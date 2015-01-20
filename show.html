@@ -3,8 +3,8 @@
 {% block title %}{{ highlight.title }}{% endblock %}
 
 {% block content %}
-<h1>{{ highlight.title }}</h1>
-<h2>Created {{ highlight.date }}</h2>
+<h2>{{ highlight.title }}</h2>
+<p>Created {{ highlight.date }}</p>
 <a href="/">back</a>
 <div>
 <pre class="brush: {{ highlight.brush }}">{{ highlight.content }}</pre>

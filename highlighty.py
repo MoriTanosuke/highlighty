@@ -29,10 +29,7 @@ class Highlight(ndb.Model):
 # [START main_page]
 class MainPage(webapp2.RequestHandler):
 	def get(self):
-		# [START query]
-		highlight_query = Highlight.query()
-		highlights = highlight_query.fetch(10)
-		# [END query]
+		highlights = get_highlights(10)
 
 		model = {
 			'highlights': highlights,
@@ -64,10 +61,13 @@ class Save(webapp2.RequestHandler):
 			highlight.put()
 			self.redirect('/')
 		else:
+			# TODO redirect to / with model to remove duplication
+			highlights = get_highlights(10)
 			model = {
-				'error': 'Captcha failed: ' + ", ".join(map(get_error_message, data['error-codes']))
+				'highlights': highlights,
+				'recaptcha_public_key': os.getenv('RECAPTCHA_PUBLIC_KEY', ''),
+				'error': 'Captcha failed: ' + ", ".join(map(get_error_message, data['error-codes'])),
 			}
-			# TODO redirect to / with model
 			template = JINJA_ENVIRONMENT.get_template('index.html')
 			self.response.write(template.render(model))
 # [END save]
@@ -96,6 +96,11 @@ class Show(webapp2.RequestHandler):
 # [END show]
 
 ###
+def get_highlights(count):
+	highlight_query = Highlight.query()
+	highlights = highlight_query.fetch(count)
+	return highlights
+
 def get_error_message(code):
 	if code == 'missing-input-response':
 		return 'Missing input. Did you answer the captcha?'

@@ -16,12 +16,12 @@ SyntaxHighlighter.highlight();
 <div>
     <form action="/new?%s" method="post">
       <div class="g-recaptcha" data-sitekey="{{ recaptcha_public_key }}"></div>
-      <div><input type="text" name="title" placeholder="Enter title..." /> <select id="brush" name="brush">
+      <div><input type="text" name="title" placeholder="Enter title..." value="{{ title }}"> <select id="brush" name="brush">
 {% for brush in brushes %}
-<option{% if brush == 'Java' %} selected="selected"{% endif %}>{{ brush.lower() }}</option>
+<option{% if brush == 'java' %} selected="selected"{% endif %}>{{ brush }}</option>
 {% endfor %}
 </select></div>
-      <div><textarea name="content" id="content" rows="3" cols="60" placeholder="Enter your code..."></textarea></div>
+      <div><textarea name="content" id="content" rows="3" cols="60" placeholder="Enter your code...">{{ content }}</textarea></div>
       <div><input type="submit"> <a href="#" class="button" id="generate">generate preview</a></div>
       <div><strong>Preview</strong><br /><div id="preview"><pre class="brush: java">No content yet.</pre></div></div>
     </form>

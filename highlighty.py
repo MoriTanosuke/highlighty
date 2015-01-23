@@ -14,7 +14,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
-BRUSHES = ["AppleScript", "AS3", "Bash", "ColdFusion", "Cpp", "CSharp", "Css", "Delphi", "Diff", "Erlang", "Groovy", "JavaFX", "Java", "JScript", "Perl", "Php", "Plain", "PowerShell", "Python", "Ruby", "Sass", "Scala", "Sql", "Vb", "Xml", "Html"]
+BRUSHES = map(lambda s: s.lower(), ["AppleScript", "AS3", "Bash", "ColdFusion", "Cpp", "CSharp", "Css", "Delphi", "Diff", "Erlang", "Groovy", "JavaFX", "Java", "JScript", "Perl", "Php", "Plain", "PowerShell", "Python", "Ruby", "Sass", "Scala", "Sql", "Vb", "Xml", "Html"])
 JINJA_ENVIRONMENT.globals['brushes'] = BRUSHES
 
 # [START highlight]
@@ -43,6 +43,9 @@ class MainPage(webapp2.RequestHandler):
 # [START save]
 class Save(webapp2.RequestHandler):
 	def post(self):
+		title = self.request.get('title')
+		content = self.request.get('content')
+		brush = self.request.get('brush')
 		captcha_response = self.request.get('g-recaptcha-response')
 		# verify captcha
 		verify_url = 'https://www.google.com/recaptcha/api/siteverify?secret=' + os.getenv('RECAPTCHA_SECRET_KEY', '') + '&response=' + captcha_response
@@ -51,13 +54,12 @@ class Save(webapp2.RequestHandler):
 		data = json.loads(response.content)
 		# break if response.success != True
 		if response.status_code == 200 and data['success'] == True:
-			title = self.request.get('title')
 			if not title:
 				title = 'No title set'
 			highlight = Highlight()
 			highlight.title = title
-			highlight.content = self.request.get('content')
-			highlight.brush = self.request.get('brush')
+			highlight.content = content
+			highlight.brush = brush
 			highlight.put()
 			self.redirect('/')
 		else:
@@ -65,6 +67,9 @@ class Save(webapp2.RequestHandler):
 			highlights = get_highlights(10)
 			model = {
 				'highlights': highlights,
+				'content': content,
+				'title': title,
+				'brush': brush,
 				'recaptcha_public_key': os.getenv('RECAPTCHA_PUBLIC_KEY', ''),
 				'error': 'Captcha failed: ' + ", ".join(map(get_error_message, data['error-codes'])),
 			}

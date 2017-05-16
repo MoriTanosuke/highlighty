@@ -107,7 +107,7 @@ class Show(webapp2.RequestHandler):
 
 ###
 def get_highlights(count):
-    highlight_query = Highlight.query()
+    highlight_query = Highlight.query().order(-Highlight.date)
     highlights = highlight_query.fetch(count)
     return highlights
 
